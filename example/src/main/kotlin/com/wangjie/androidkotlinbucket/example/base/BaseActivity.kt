@@ -3,6 +3,8 @@ package com.wangjie.androidkotlinbucket.example.base
 import android.app.ProgressDialog
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import com.wangjie.androidkotlinbucket.library.KIViewer
 import com.wangjie.androidkotlinbucket.library.KPresenter
 import com.wangjie.androidkotlinbucket.library.KViewer
 
@@ -11,21 +13,20 @@ import com.wangjie.androidkotlinbucket.library.KViewer
  * Email: tiantian.china.2@gmail.com
  * Date: 11/9/15.
  */
-open class BaseActivity : AppCompatActivity(), KViewer {
-//    override val onClickListener: ((View) -> Unit)? = null
+abstract class BaseActivity : AppCompatActivity(), KViewer {
 
     protected open val presenter: KPresenter<*>? = null
-    override val context: Context? = this
+    override val mContext: Context? = this
 
     private val loadingDialog: ProgressDialog by lazy { ProgressDialog(this) }
 
-    override fun loadingDialog(message: String) {
+    override fun showLoading(message: String) {
         loadingDialog.setMessage(message)
         loadingDialog.show()
     }
 
-    override fun cancelLoadingDialog() {
-        if(loadingDialog.isShowing){
+    override fun cancelLoading() {
+        if (loadingDialog.isShowing) {
             loadingDialog.cancel()
         }
     }
@@ -36,4 +37,5 @@ open class BaseActivity : AppCompatActivity(), KViewer {
 
         presenter?.closeAll()
     }
+
 }

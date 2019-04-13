@@ -18,9 +18,12 @@ import android.widget.Toast
  * MVP的View层，UI相关，Activity需要实现该interface
  * 它会包含一个Presenter的引用，当有事件发生（比如按钮点击后），会调用Presenter层的方法
  */
-public interface KIViewer {
-    //    val onClickListener: ((view: View) -> Unit)?
-    val mContext: Context?;
+interface KIViewer {
+    val mContext: Context?
+    fun <T : View> findView(resId: Int): T
+}
+
+interface KViewer : KIViewer {
 
     fun toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
         mContext?.lets { Toast.makeText(this, message, duration).show() }
@@ -51,21 +54,19 @@ public interface KIViewer {
         Log.w(KIViewer::class.java.simpleName, "cancelLoadingDialog should impl by subclass")
     }
 
-    fun <T : View> findView(resId: Int): T;
-
 }
 
 /**
  * MVP的Presenter层，作为沟通View和Model的桥梁，它从Model层检索数据后，返回给View层，它也可以决定与View层的交互操作。
  * 它包含一个View层的引用和一个Model层的引用
  */
-public interface KIPresenter {
-    public fun closeAll()
+interface KIPresenter {
+    fun closeAll()
 }
 
-public open class KPresenter<V : KIViewer>(var viewer: V) : KIPresenter {
+open class KPresenter<V : KIViewer>(var viewer: V) : KIPresenter {
 
-    override public fun closeAll() {
+    override fun closeAll() {
         Log.w(KIViewer::class.java.simpleName, "closeAll in KPresenter should impl by subclass")
     }
 
@@ -74,13 +75,13 @@ public open class KPresenter<V : KIViewer>(var viewer: V) : KIPresenter {
 /**
  * Controller，用于派发View中的事件，它在根据不同的事件调用Presenter
  */
-public interface KIController {
+interface KIController {
     /**
      * 注册事件
      */
     fun bindEvents()
 
-    fun <T : View> getView(resId: Int): T;
+    fun <T : View> getView(resId: Int): T
     fun closeAll()
 
 //    /**
@@ -103,19 +104,19 @@ public interface KIController {
 
 }
 
-public abstract class KController<KV : KIViewer, KP : KPresenter<*>>(val viewer: KV, presenterCreate: () -> KP) : KIController {
-    protected val presenter: KP by _lazy { presenterCreate() }
+abstract class KController<KV : KIViewer, KP : KPresenter<*>>(val viewer: KV, presenterCreate: () -> KP) : KIController {
+    private val presenter: KP by _lazy { presenterCreate() }
 
-    private val viewCache: SparseArray<View> = SparseArray();
+    private val viewCache: SparseArray<View> = SparseArray()
 
-    public override fun <T : View> getView(resId: Int): T {
+    override fun <T : View> getView(resId: Int): T {
         val view: View? = viewCache.get(resId)
         return view as T? ?: viewer.findView<T>(resId).apply {
             viewCache.put(resId, this)
         }
     }
 
-    public override fun closeAll() = presenter.closeAll()
+    override fun closeAll() = presenter.closeAll()
 
 
 }

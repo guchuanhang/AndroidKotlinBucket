@@ -7,13 +7,15 @@ import android.view.View
 import android.widget.TextView
 import com.wangjie.androidkotlinbucket.example.base.BaseActivity
 import com.wangjie.androidkotlinbucket.library._pick
-import com.wangjie.androidkotlinbucket.library._presenter
+
+//import com.wangjie.androidkotlinbucket.library._presenter
 
 class MainActivity : BaseActivity(), MainViewer {
-
+    override fun <T : View> findView(resId: Int): T = findView(resId)
     private val tv: TextView by _pick(R.id.activity_main_tv)
 
-    override val presenter: MainPresenter by _presenter { MainPresenter(this) }
+    override val presenter: MainPresenter by lazy { MainPresenter(this) }
+//    override val presenter: MainPresenter by _presenter { MainPresenter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

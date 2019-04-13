@@ -13,15 +13,12 @@ import rx.schedulers.Schedulers
  * Email: tiantian.china.2@gmail.com
  * Date: 11/9/15.
  */
-public class MainPresenter(viewer: MainViewer) : BasePresenter<MainViewer>(viewer) {
+class MainPresenter(viewer: MainViewer) : BasePresenter<MainViewer>(viewer) {
 
-    public fun test() {
+    fun test() {
 
-        viewer.dialog("title", "Load data ?", positiveClickListener = {
-            dialog, int ->
-
-            viewer.loadingDialog("I'm loading...")
-
+        viewer.dialog("title", "Load data ?", positiveClickListener = { dialog, int ->
+            viewer.showLoading("I'm loading...")
             Observable.create<String> {
                 Thread.sleep(2000)
                 it.onNext("load success")
@@ -29,7 +26,7 @@ public class MainPresenter(viewer: MainViewer) : BasePresenter<MainViewer>(viewe
             }
                     .subscribeOn(Schedulers.newThread())
                     .observeOnMain()
-                    .doOnNextOrError { viewer.cancelLoadingDialog() }
+                    .doOnNextOrError { viewer.cancelLoading() }
                     .subscribeSafeNext {
                         viewer.toast("succeed: $it")
                     }
